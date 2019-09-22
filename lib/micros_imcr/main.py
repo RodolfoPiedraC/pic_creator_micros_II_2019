@@ -17,4 +17,3 @@
 
 def micros_imcr_main():
     print("Package First Commit")
-    print("Package Second Commit")
