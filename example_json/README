@@ -1,0 +1,6 @@
+The JSON parameters must be:
+color1-4:   Array with colors on RGB scale
+background: String with the name o the color for the background
+sizex:      Image size on X axis
+sizey:      Image size on Y axis
+format:     Extension of the created image files
