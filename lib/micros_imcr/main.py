@@ -15,7 +15,7 @@
 # limitations under the License.
 
 import random
-from PIL import Image
+from PIL import Image, ImageDraw
 from json import loads
 from logging import getLogger
 
@@ -47,6 +47,12 @@ class ImcrPrinter:
             size=(self.__imcr_sizex, self.__imcr_sizey),
             color=self.__background)
 
+    def get_color_array_size(self):
+        """
+        Return the size of the color_array
+        """
+        return len(self.__imcr_color_array)
+
     def get_random_index(self):
         """
         Return a random valid index for the color_array
@@ -69,26 +75,24 @@ class ImcrPrinter:
         self.current_image.save(
             "{}.{}".format(file_root_name, self.__imcr_extension))
 
-    def draw_line(self, x_start, y_start, x_increase, y_increase, length,
-                  color_index):
+    def draw_line(self, x_start, y_start, x_finish, y_finish, color_index):
         """
         Based on the different parameters creates a line in the objects image
         :param x_start:       X position of the start pixel
         :param y_start:       Y position of the start pixel
-        :param x_increase:    Value to increase the X axis o each pixel drawing
-        :param y_increase:    Value to increase the Y axis o each pixel drawing
-        :param length:        Length in pixels of the desired line
+        :param x_finish:      X position of the last pixel
+        :param y_finish:      Y position of the last pixel
         :param color_index:   Color index used to obtain the color from
                               __imcr_color_array
         """
         # Check that the length plus the start don't go over the images size
         # ---------------------
-        if x_increase and (x_start + length > self.__imcr_sizex):
+        if x_finish > self.__imcr_sizex:
             log.error("Start of X position plus the length goes beyond the"
                       " image's size")
             raise ValueError
 
-        if y_increase and (y_start + length > self.__imcr_sizey):
+        if y_finish > self.__imcr_sizey:
             log.error("Start of Y position plus the length goes beyond the"
                       " image's size")
             raise ValueError
@@ -101,27 +105,12 @@ class ImcrPrinter:
         # ---------------------
         current_color = self.__imcr_color_array[color_index]
 
-        # Initialize step counters
-        x_counter = 0
-        y_counter = 0
-
         # Start drawline process
         # ---------------------
-        for i in range(length):
-            # Use the putpixel method to write the desired pixel
-            # XY param defines the position
-            # Color param uses a tuple with the RGB values respectively
-            self.current_image.putpixel(
-                xy=(x_start + x_counter, y_start + y_counter),
-                value=(current_color[0], current_color[1], current_color[2]))
-
-            # Increase x_counter and y_counter for the next iteration
-            if x_increase:
-                x_counter += x_increase
-
-            # Increase y_counter for the next iteration
-            if y_increase:
-                y_counter += y_increase
+        drawer = ImageDraw.Draw(self.current_image)
+        drawer.line(
+            xy=(x_start, y_start, x_finish, y_finish),
+            fill=(current_color[0], current_color[1], current_color[2]))
 
 
 def micros_imcr_main(args):
@@ -148,9 +137,106 @@ def micros_imcr_main(args):
     printer.draw_line(
         x_start=imcr_sizex//2,
         y_start=imcr_sizey//3,
-        x_increase=0,
-        y_increase=1,
-        length=imcr_sizey//3,
+        x_finish=imcr_sizex//2,
+        y_finish=2*imcr_sizey//3,
         color_index=printer.get_random_index())
 
-    printer.save_image(file_root_name="new")
+    printer.save_image(file_root_name="simple_line")
+
+    # Second Drawing: Multiple lines
+    # Restart Image
+    printer.restart_image()
+
+    # Adds one horizontal line of each color with no intersections
+    for i in range(printer.get_color_array_size()):
+        printer.draw_line(
+            x_start=imcr_sizex//3,
+            y_start=(i+1)*imcr_sizey//5,
+            x_finish=2*imcr_sizex//3,
+            y_finish=(i+1)*imcr_sizey//5,
+            color_index=i)
+
+    printer.save_image(file_root_name="multiple_horizontal_line")
+
+    # Third Drawing: Diagonal line
+    # Restart Image
+    printer.restart_image()
+
+    # Adds two diagonal lines of the same color
+    random_color = printer.get_random_index()
+    for i in range(2):
+        printer.draw_line(
+            x_start=imcr_sizex//5,
+            y_start=(i+1)*imcr_sizey//5,
+            x_finish=2*imcr_sizex//5,
+            y_finish=(i+2)*imcr_sizey//5,
+            color_index=random_color)
+
+    printer.save_image(file_root_name="diagonal_lines")
+
+    # Fourth Drawing: Intersection
+    # Restart Image
+    printer.restart_image()
+
+    # Diagonal intersection using two random colors
+    # Draw first diagonal
+    random_color = printer.get_random_index()
+    printer.draw_line(
+        x_start=imcr_sizex//3,
+        y_start=imcr_sizey//5,
+        x_finish=2*imcr_sizex//3,
+        y_finish=4*imcr_sizey//5,
+        color_index=random_color)
+
+    # Draw second diagonal
+    second_random_color = random_color
+    while second_random_color == random_color:
+        second_random_color = printer.get_random_index()
+
+    printer.draw_line(
+        x_start=imcr_sizex//3,
+        y_start=4*imcr_sizey//5,
+        x_finish=2*imcr_sizex//3,
+        y_finish=imcr_sizey//5,
+        color_index=second_random_color)
+
+    printer.save_image(file_root_name="diagonal_intersection")
+
+    # Fifth Drawing: Four Line intersection
+    # Restart Image
+    printer.restart_image()
+
+    # Creates four lines where there are multiple intersections
+    # Draw first line
+    printer.draw_line(
+        x_start=imcr_sizex//3,
+        y_start=imcr_sizey//5,
+        x_finish=2*imcr_sizex//3,
+        y_finish=4*imcr_sizey//5,
+        color_index=0)
+
+    # Draw second line
+    printer.draw_line(
+        x_start=imcr_sizex//3,
+        y_start=imcr_sizey//4,
+        x_finish=2*imcr_sizex//3,
+        y_finish=imcr_sizey//4,
+        color_index=1)
+
+    # Draw third line
+    printer.draw_line(
+        x_start=imcr_sizex//4,
+        y_start=4*imcr_sizey//5,
+        x_finish=3*imcr_sizex//4,
+        y_finish=3*imcr_sizey//5,
+        color_index=2)
+
+    # Draw second line
+    printer.draw_line(
+        x_start=imcr_sizex//2,
+        y_start=1*imcr_sizey//5,
+        x_finish=imcr_sizex//2,
+        y_finish=4*imcr_sizey//5,
+        color_index=3)
+
+    printer.save_image(file_root_name="full_intersection")
