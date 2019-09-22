@@ -21,6 +21,10 @@ Micros_IMCR generator executable script.
 
 if __name__ == '__main__':
 
+    # Get the arguments
+    from micros_imcr.args import parse_args
+    args = parse_args()
+
     # Run program
     from micros_imcr.main import micros_imcr_main
-    exit(micros_imcr_main())
+    exit(micros_imcr_main(args))

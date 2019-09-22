@@ -14,6 +14,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from json import loads
 
-def micros_imcr_main():
-    print("Package First Commit")
+
+def micros_imcr_main(args):
+
+    # Obtain the json information
+    # --------------------------------------------------------------------------
+    # Read the file
+    json_file = open(args.path_to_json).read()
+    json_data = loads(json_file)
+
+    print("JSON DATA: {}".format(json_data))
+
+    # Generate the basic images
+    # --------------------------------------------------------------------------

@@ -18,6 +18,9 @@
 imcr package entry point.
 """
 
+from __future__ import unicode_literals, absolute_import
+from __future__ import print_function, division
+
 __author__ = 'Rodolfo Piedra Camacho'
 __email__ = 'rjpiedra@itcr.ac.cr'
 __version__ = '0.1.0'

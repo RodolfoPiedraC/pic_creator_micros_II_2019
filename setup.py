@@ -67,7 +67,6 @@ setuptools.setup(
     author_email="rjpiedra@itcr.ac.cr",
     description="Image Creator package",
     long_description=long_description,
-    long_description_content_type="text/markdown",
 
     url="https://github.com/RodolfoPiedraC/pic_creator_micros_II_2019",
 
@@ -75,7 +74,7 @@ setuptools.setup(
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
-        'Intended Audience :: Users'
+        'Intended Audience :: Developers'
     ],
     python_requires='>=3.5',
 )
