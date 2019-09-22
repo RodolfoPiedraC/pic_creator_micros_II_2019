@@ -56,6 +56,9 @@ setuptools.setup(
     package_dir={'': 'lib'},
     packages=setuptools.find_packages('lib'),
 
+    # Scripts are located under the bin directory
+    scripts=['bin/micros_imcr'],
+
     # Dependencies
     install_requires=find_requirements('requirements.txt'),
 
