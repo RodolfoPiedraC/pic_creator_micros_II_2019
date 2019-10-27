@@ -13,3 +13,6 @@ Como usar:
     from micros_imcr import imcr_tool
     imcr_tool.micros_imcr_tool(PATH)
     NOTA: PATH es la dirección al json
+
+Indiferente del método utilizado las imagenes se almacenan en la carpeta donde se
+corrio el script o donde se abrio python3
