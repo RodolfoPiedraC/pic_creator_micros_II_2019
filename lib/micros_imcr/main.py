@@ -112,6 +112,48 @@ class ImcrPrinter:
             xy=(x_start, y_start, x_finish, y_finish),
             fill=(current_color[0], current_color[1], current_color[2]))
 
+    def draw_arc(self, x_start, y_start, x_finish, y_finish, start_angle,
+                 end_angle, color_index):
+        """
+        Based on the different parameters creates a line in the objects image
+        :param x_start:       X position of upper left corner
+        :param y_start:       Y position of the upper left corner
+        :param x_finish:      X position of the lower rigth corner
+        :param y_finish:      Y position of the lower rigth corner
+        :param start_angle:   Angle which the arc uses to start drawing
+        :param eng_angle:     Angle which the arc uses to end the drawing
+        :param color_index:   Color index used to obtain the color from
+                              __imcr_color_array
+        """
+        # Check that the length plus the start don't go over the images size
+        # ---------------------
+        if x_finish > self.__imcr_sizex:
+            log.error("Start of X position plus the length goes beyond the"
+                      " image's size")
+            raise ValueError
+
+        if y_finish > self.__imcr_sizey:
+            log.error("Start of Y position plus the length goes beyond the"
+                      " image's size")
+            raise ValueError
+
+        # Check that the desired index is obtainable
+        if color_index > len(self.__imcr_color_array):
+            log.error("Desired color index goes beyond the color array")
+
+        # Get the desired color
+        # ---------------------
+        current_color = self.__imcr_color_array[color_index]
+
+        # Start drawline process
+        # ---------------------
+        drawer = ImageDraw.Draw(self.current_image)
+        drawer.arc(
+            xy=(x_start, y_start, x_finish, y_finish),
+            start=start_angle,
+            end=end_angle,
+            fill=(current_color[0], current_color[1], current_color[2]))
+
 
 def micros_imcr_main(args):
     """
@@ -133,6 +175,7 @@ def micros_imcr_main(args):
     # Generate the basic images
     # --------------------------------------------------------------------------
     # First Drawing: Single vertical Line
+    # ###################################
     # Starts 1/3 in the y axis and draws 1/3 of the size
     printer.draw_line(
         x_start=imcr_sizex//2,
@@ -144,6 +187,7 @@ def micros_imcr_main(args):
     printer.save_image(file_root_name="simple_line")
 
     # Second Drawing: Multiple lines
+    # ###################################
     # Restart Image
     printer.restart_image()
 
@@ -159,6 +203,7 @@ def micros_imcr_main(args):
     printer.save_image(file_root_name="multiple_horizontal_line")
 
     # Third Drawing: Diagonal line
+    # ###################################
     # Restart Image
     printer.restart_image()
 
@@ -175,6 +220,7 @@ def micros_imcr_main(args):
     printer.save_image(file_root_name="diagonal_lines")
 
     # Fourth Drawing: Intersection
+    # ###################################
     # Restart Image
     printer.restart_image()
 
@@ -203,6 +249,7 @@ def micros_imcr_main(args):
     printer.save_image(file_root_name="diagonal_intersection")
 
     # Fifth Drawing: Four Line intersection
+    # ###################################
     # Restart Image
     printer.restart_image()
 
@@ -240,3 +287,176 @@ def micros_imcr_main(args):
         color_index=3)
 
     printer.save_image(file_root_name="full_intersection")
+
+    # Sixth Drawing: Three lines
+    # ###################################
+    # Restart Image
+    printer.restart_image()
+
+    # Creates three lines with no intersections
+    # Draw first line
+    printer.draw_line(
+        x_start=imcr_sizex//9,
+        y_start=imcr_sizey//5,
+        x_finish=3*imcr_sizex//4,
+        y_finish=imcr_sizey//5,
+        color_index=0)
+
+    # Draw second line
+    printer.draw_line(
+        x_start=4*imcr_sizex//5,
+        y_start=3*imcr_sizey//5,
+        x_finish=4*imcr_sizex//5,
+        y_finish=imcr_sizey,
+        color_index=2)
+
+    # Draw third line
+    printer.draw_line(
+        x_start=imcr_sizex//6,
+        y_start=7*imcr_sizey//8,
+        x_finish=imcr_sizex//3,
+        y_finish=imcr_sizey//6,
+        color_index=3)
+
+    # Save the image
+    printer.save_image(file_root_name="three_line_test")
+
+    # Seventh Drawing: Curve
+    # ################################
+    # Restart Image
+    printer.restart_image()
+
+    # Draw first arc
+    printer.draw_arc(
+        x_start=2*imcr_sizex//7,
+        y_start=imcr_sizey//9,
+        x_finish=5*imcr_sizex//7,
+        y_finish=8*imcr_sizey//9,
+        start_angle=90,
+        end_angle=270,
+        color_index=0)
+
+    # Draw second arc
+    printer.draw_arc(
+        x_start=1*imcr_sizex//7,
+        y_start=imcr_sizey//9,
+        x_finish=3*imcr_sizex//7,
+        y_finish=8*imcr_sizey//9,
+        start_angle=270,
+        end_angle=90,
+        color_index=3)
+
+    # Save the image
+    printer.save_image(file_root_name="curve")
+
+    # Eigth Drawing: Happy face
+    # ################################
+    # Restart Image
+    printer.restart_image()
+
+    # Draw first arc
+    printer.draw_arc(
+        x_start=1*imcr_sizex//7,
+        y_start=5*imcr_sizey//9,
+        x_finish=6*imcr_sizex//7,
+        y_finish=8*imcr_sizey//9,
+        start_angle=0,
+        end_angle=180,
+        color_index=0)
+
+    # Draw first line
+    printer.draw_line(
+        x_start=2*imcr_sizex//5,
+        y_start=imcr_sizey//3,
+        x_finish=2*imcr_sizex//5,
+        y_finish=2*imcr_sizey//3,
+        color_index=1)
+
+    # Draw second line
+    printer.draw_line(
+        x_start=3*imcr_sizex//5,
+        y_start=imcr_sizey//3,
+        x_finish=3*imcr_sizex//5,
+        y_finish=2*imcr_sizey//3,
+        color_index=1)
+
+    # Save the image
+    printer.save_image(file_root_name="happy_face")
+
+    # Ninth Drawing: Sad face
+    # ################################
+    # Restart Image
+    printer.restart_image()
+
+    # Draw first arc
+    printer.draw_arc(
+        x_start=1*imcr_sizex//7,
+        y_start=6*imcr_sizey//9,
+        x_finish=6*imcr_sizex//7,
+        y_finish=8*imcr_sizey//9,
+        start_angle=180,
+        end_angle=0,
+        color_index=2)
+
+    # Draw first line
+    printer.draw_line(
+        x_start=2*imcr_sizex//5,
+        y_start=imcr_sizey//4,
+        x_finish=2*imcr_sizex//5,
+        y_finish=2*imcr_sizey//4,
+        color_index=3)
+
+    # Draw second line
+    printer.draw_line(
+        x_start=3*imcr_sizex//5,
+        y_start=imcr_sizey//4,
+        x_finish=3*imcr_sizex//5,
+        y_finish=2*imcr_sizey//4,
+        color_index=3)
+
+    # Save the image
+    printer.save_image(file_root_name="sad_face")
+
+    # Tenth Drawing: Curve and cross
+    # ################################
+    # Restart Image
+    printer.restart_image()
+
+    # Draw first arc
+    printer.draw_arc(
+        y_start=4*imcr_sizey//7,
+        x_start=imcr_sizex//6,
+        y_finish=6*imcr_sizey//7,
+        x_finish=5*imcr_sizex//6,
+        start_angle=180,
+        end_angle=0,
+        color_index=0)
+
+    # Draw second arc
+    printer.draw_arc(
+        y_start=3*imcr_sizey//7,
+        x_start=imcr_sizex//6,
+        y_finish=5*imcr_sizey//7,
+        x_finish=5*imcr_sizex//6,
+        start_angle=0,
+        end_angle=180,
+        color_index=3)
+
+    # Draw first line
+    printer.draw_line(
+        x_start=imcr_sizex//2,
+        y_start=imcr_sizey//4,
+        x_finish=imcr_sizex//2,
+        y_finish=3*imcr_sizey//4,
+        color_index=1)
+
+    # Draw second line
+    printer.draw_line(
+        x_start=imcr_sizex//5,
+        y_start=imcr_sizey//2,
+        x_finish=4*imcr_sizex//5,
+        y_finish=imcr_sizey//2,
+        color_index=2)
+
+    # Save the image
+    printer.save_image(file_root_name="curve_and_cross")
